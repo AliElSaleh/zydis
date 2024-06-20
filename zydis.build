@@ -1,0 +1,66 @@
+Assembly Zydis
+Version! 4.0.0.0
+if shared Type dynamic_lib else Type static_lib
+if _platform == windows Compiler cl else Compiler clang
+
+BuildDirectory        bin
+IntermediateDirectory int
+
+IncludedSourceDirectories src resources
+IncludedSourceFiles [
+    src/MetaInfo.c
+    src/Mnemonic.c
+    src/Register.c
+    src/Segment.c
+    src/SharedData.c
+    src/String.c
+    src/Utils.c
+    src/Zydis.c
+]
+
+FeatureSources
+
+if !disable_decoder {
+    FeatureSources src/Decoder.c src/DecoderData.c
+
+    if !disable_encoder FeatureSources src/Encoder.c src/EncoderData.c
+
+    if !minimal if !disable_formatter FeatureSources [
+        src/Disassembler.c
+        src/Formatter.c
+        src/FormatterBuffer.c
+        src/FormatterATT.c
+        src/FormatterBase.c
+        src/FormatterIntel.c
+    ]
+
+    if !disable_segment FeatureSources src/Segment.c
+}
+
+IncludedSourceFiles $FeatureSources
+
+CompilerFlags
+LinkerFlags
+Includes              include src dependencies/zycore/include
+Defines               _CRT_SECURE_NO_WARNINGS
+
+if compiler == cl {
+    if _bit == 32 LinkerFlags /MACHINE:x86
+    if _bit == 64 LinkerFlags /MACHINE:x64
+}
+
+if !shared            Defines ZYDIS_STATIC_BUILD
+if shared             Defines ZYDIS_SHOULD_EXPORT
+if minimal            Defines ZYDIS_MINIMAL_MODE
+if disable_decoder    Defines ZYDIS_DISABLE_DECODER
+if disable_encoder    Defines ZYDIS_DISABLE_ENCODER
+if disable_formatter  Defines ZYDIS_DISABLE_FORMATTER
+if disable_avx512     Defines ZYDIS_DISABLE_AVX512
+if disable_knc        Defines ZYDIS_DISABLE_KNC
+if disable_segment    Defines ZYDIS_DISABLE_SEGMENT
+
+Libraries             Zycore
+LibraryDirectories    dependencies/zycore/bin
+
+Depends               zycore dependencies/zycore | %%
+
