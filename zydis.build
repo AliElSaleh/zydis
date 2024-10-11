@@ -1,7 +1,8 @@
 Assembly Zydis
-Version! 4.0.0.0
-if shared Type dynamic_lib else Type static_lib
-if _platform == windows Compiler cl else Compiler clang
+Version   4.0.0.0
+
+if shared  Type     dynamic_lib else Type     static_lib
+if windows Compiler cl          else Compiler clang
 
 BuildDirectory        bin
 IntermediateDirectory int
@@ -40,13 +41,13 @@ if !disable_decoder {
 IncludedSourceFiles $FeatureSources
 
 CompilerFlags
-LinkerFlags
+LinkerFlags           
 Includes              include src dependencies/zycore/include
 Defines               _CRT_SECURE_NO_WARNINGS
 
 if compiler == cl {
-    if _bit == 32 LinkerFlags /MACHINE:x86
-    if _bit == 64 LinkerFlags /MACHINE:x64
+    if 32-bit LinkerFlags /MACHINE:x86
+    if 64-bit LinkerFlags /MACHINE:x64
 }
 
 if !shared            Defines ZYDIS_STATIC_BUILD
@@ -63,4 +64,3 @@ Libraries             Zycore
 LibraryDirectories    dependencies/zycore/bin
 
 Depends               zycore dependencies/zycore | %%
-
